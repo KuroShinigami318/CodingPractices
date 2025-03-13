@@ -25,7 +25,34 @@ Cache::Node::Node(int i_key, int i_value)
 {
 }
 
-void Cache::push_cache(int key, int value)
+LRUCache::LRUCache(int i_cp)
+    : Cache(i_cp)
+{
+}
+
+int LRUCache::get(int key)
+{
+    if (auto foundCacheIt = mp.find(key); foundCacheIt != mp.end())
+    {
+        return use_cache(foundCacheIt->second);
+    }
+
+    return -1;
+}
+
+void LRUCache::set(int key, int value)
+{
+    if (auto foundCacheIt = mp.find(key); foundCacheIt != mp.end())
+    {
+        foundCacheIt->second->value = value;
+    }
+    else
+    {
+        push_cache(key, value);
+    }
+}
+
+void LRUCache::push_cache(int key, int value)
 {
     Node* newCache = new Node(key, value);
     if (!head)
@@ -46,7 +73,7 @@ void Cache::push_cache(int key, int value)
     mp[key] = head;
 }
 
-void Cache::pop_cache()
+void LRUCache::pop_cache()
 {
     if (!tail)
     {
@@ -63,7 +90,7 @@ void Cache::pop_cache()
     tail = prevCache;
 }
 
-int Cache::use_cache(Node* cacheNode)
+int LRUCache::use_cache(Node* cacheNode)
 {
     if (!cacheNode)
     {
@@ -90,33 +117,6 @@ int Cache::use_cache(Node* cacheNode)
     }
 
     return head->value;
-}
-
-LRUCache::LRUCache(int i_cp)
-    : Cache(i_cp)
-{
-}
-
-int LRUCache::get(int key)
-{
-    if (auto foundCacheIt = mp.find(key); foundCacheIt != mp.end())
-    {
-        return use_cache(foundCacheIt->second);
-    }
-
-    return -1;
-}
-
-void LRUCache::set(int key, int value)
-{
-    if (auto foundCacheIt = mp.find(key); foundCacheIt != mp.end())
-    {
-        foundCacheIt->second->value = value;
-    }
-    else
-    {
-        push_cache(key, value);
-    }
 }
 
 void DoCommand(const std::string& command, Cache& cache)
